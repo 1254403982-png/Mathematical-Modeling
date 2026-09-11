@@ -1,0 +1,12 @@
+# Normalise text files; keep binaries untouched.
+* text=auto
+
+*.xlsx binary
+*.xls  binary
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+
+*.py   text
+*.md   text
+*.txt  text
