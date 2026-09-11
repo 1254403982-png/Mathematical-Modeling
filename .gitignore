@@ -5,9 +5,15 @@ __pycache__/
 
 # Contest data, official templates, and generated results stay local
 data/*.xlsx
-outputs/
+data/*.xls
+data/*.csv
+outputs/*
+!outputs/README.md
 
 # OS/editor files
 .DS_Store
 Thumbs.db
 ~$*
+.idea/
+.vscode/
+*.tmp
