@@ -1,0 +1,13 @@
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+.venv/
+
+# Contest data, official templates, and generated results stay local
+data/*.xlsx
+outputs/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+~$*
