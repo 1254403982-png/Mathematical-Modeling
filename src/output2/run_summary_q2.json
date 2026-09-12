@@ -1,0 +1,208 @@
+{
+  "generated_at": "2026-09-12T18:52:06+08:00",
+  "run_type": "full",
+  "formal_days_completed": 334,
+  "parameters": {
+    "periods_per_day": 144,
+    "delta_t_hours": 0.16666666666666666,
+    "eta_charge": 0.9,
+    "eta_discharge": 0.9,
+    "soc_min_kwh": 1200.0,
+    "soc_max_kwh": 10800.0,
+    "initial_soc_2025_02_01_kwh": 6000.0,
+    "max_action_kwh_per_period": 833.3333333333334,
+    "max_scenarios": 30,
+    "terminal_price_window": "physical 00:00-05:00",
+    "terminal_price_slot_start": 0,
+    "terminal_price_slot_end_exclusive": 30,
+    "terminal_price_mean_yuan_per_kwh": 0.43339333333333335,
+    "terminal_efficiency_basis": "charge",
+    "terminal_value_coefficient_yuan_per_kwh": 0.48154814814814817,
+    "dp_grid_step_kwh": 10.0,
+    "random_seed": 1,
+    "low_load_weekdays": [
+      "Friday",
+      "Saturday"
+    ],
+    "load_class_validation_scope": "2025-01-only",
+    "forecast_bias_window_days": 30,
+    "result2_plan_mapping": "date d: physical t=2..144 plus date d+1 t=1"
+  },
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pulp": "3.3.2",
+    "openpyxl": "3.1.5",
+    "highspy": "1.15.1"
+  },
+  "inputs": {
+    "price_input": "data/附件/附件1.xlsx",
+    "price_input_sha256": "66b87134f5ecccd68184d3539bb1293ef039f9e0fdd955a589b9bfa7f227c377",
+    "annual_input": "data/附件/附件2.xlsx",
+    "annual_input_sha256": "2e95fd446bfafa0d8c59577b5c2e2ea8b3f1def20dde54a3062556f4da9b4c72",
+    "template": "data/附件/附件5/result2.xlsx",
+    "template_sha256": "1c26494cfc6d754e0bd9bff7e13e1126a73d2d2da6c5336eb251d89b9a1a1a47",
+    "attachment3_read": false
+  },
+  "load_class_validation": {
+    "scope": "2025-01-only",
+    "uses_february_to_december": false,
+    "low_class_weekdays": [
+      "周五",
+      "周六"
+    ],
+    "low_class_sample_days": 9,
+    "regular_class_sample_days": 22,
+    "low_class_mean_daily_load_kwh": 81104.1970925926,
+    "regular_class_mean_daily_load_kwh": 126638.07669166666,
+    "low_to_regular_ratio": 0.640440846950494,
+    "low_class_percent_below_regular": 35.9559153049506,
+    "weekday_mean_order_low_to_high": [
+      "周五",
+      "周六",
+      "周一",
+      "周二",
+      "周三",
+      "周日",
+      "周四"
+    ],
+    "lowest_two_are_friday_saturday": true,
+    "strictly_separated_from_other_weekdays": true,
+    "passed": true
+  },
+  "forecast_backtest": {
+    "aggregate_rows": [
+      {
+        "method": "baseline_recent3_equal_no_bias",
+        "resource": "load",
+        "days": 334,
+        "mean_daily_mae_kwh": 157.51306501152786,
+        "root_mean_daily_mse_kwh": 206.88770410502428,
+        "mean_bias_forecast_minus_actual_kwh": -0.8637456685009626
+      },
+      {
+        "method": "baseline_recent3_equal_no_bias",
+        "resource": "pv",
+        "days": 334,
+        "mean_daily_mae_kwh": 25.74308892804668,
+        "root_mean_daily_mse_kwh": 52.24659819417524,
+        "mean_bias_forecast_minus_actual_kwh": 0.25033522873234876
+      },
+      {
+        "method": "main_weighted_plus_30day_bias",
+        "resource": "load",
+        "days": 334,
+        "mean_daily_mae_kwh": 23.303166512243422,
+        "root_mean_daily_mse_kwh": 31.588947363686714,
+        "mean_bias_forecast_minus_actual_kwh": -0.05855490185775661
+      },
+      {
+        "method": "main_weighted_plus_30day_bias",
+        "resource": "pv",
+        "days": 334,
+        "mean_daily_mae_kwh": 26.418015960680012,
+        "root_mean_daily_mse_kwh": 53.925524882712715,
+        "mean_bias_forecast_minus_actual_kwh": 0.17842068144536397
+      }
+    ],
+    "main_vs_baseline": {
+      "load": {
+        "mae_improved": true,
+        "rmse_improved": true,
+        "main_minus_baseline_mae_kwh": -134.20989849928444,
+        "main_minus_baseline_rmse_kwh": -175.29875674133757
+      },
+      "pv": {
+        "mae_improved": false,
+        "rmse_improved": false,
+        "main_minus_baseline_mae_kwh": 0.674927032633331,
+        "main_minus_baseline_rmse_kwh": 1.678926688537473
+      }
+    },
+    "automatic_fallback_performed": false
+  },
+  "annual_totals": {
+    "days": 334,
+    "plan_energy_kwh": 20678005.191400524,
+    "plan_cost_yuan": 12765875.35208156,
+    "dp_emergency_energy_kwh": 142470.03098213612,
+    "dp_emergency_cost_yuan": 765792.4364577917,
+    "dp_total_cost_yuan": 13531667.788539352,
+    "analytical_emergency_energy_kwh": 138615.10290316746,
+    "analytical_emergency_cost_yuan": 857669.8711681358,
+    "analytical_total_cost_yuan": 13623545.223249696,
+    "dp_saving_yuan": 91877.4347103443,
+    "dp_saving_rate_percent": 0.6744018036769749
+  },
+  "validation": {
+    "tolerance": 1e-06,
+    "max_planning_balance_residual_kwh": 1.6104877431644127e-09,
+    "max_planning_soc_residual_kwh": 1.4406396076083183e-09,
+    "max_dp_balance_residual_kwh": 1.0231815394945443e-12,
+    "max_dp_soc_residual_kwh": 1.1368683772161603e-13,
+    "max_analytical_balance_residual_kwh": 1.1368683772161603e-13,
+    "max_analytical_soc_residual_kwh": 9.094947017729282e-13,
+    "max_dp_value_convexity_violation": 4.3653969328261155e-12,
+    "max_dp_cross_day_soc_residual_kwh": 0.0,
+    "max_analytical_cross_day_soc_residual_kwh": 0.0,
+    "max_daily_cost_identity_residual_yuan": 0.0,
+    "all_planning_statuses_optimal": true,
+    "all_checks_passed": true
+  },
+  "template_validation": {
+    "sheet_names_preserved": true,
+    "plan_rows": 334,
+    "plan_physical_mapping": "date d: t=2..144 plus date d+1 t=1",
+    "storage_rows": 2004,
+    "storage_all_days_filled": true,
+    "emergency_rows_dynamic": true,
+    "emergency_days_with_purchase": 130,
+    "max_roundtrip_value_difference": 3.637978807091713e-12
+  },
+  "runtime_seconds": 259.1239835000015,
+  "warnings": [
+    "主预测对pv未同时改善总体MAE与RMSE；按指令保留主方案，未回退。"
+  ],
+  "outputs": {
+    "load_class_validation": {
+      "path": "output/q2_terminal_fix/q2_load_class_validation.csv",
+      "sha256": "dc0af526d771b355818769ee816e4c32a64efda1439aa42d6e00dd8ff273f74d"
+    },
+    "daily_metrics": {
+      "path": "output/q2_terminal_fix/q2_daily_metrics.csv",
+      "sha256": "a66ee664607dd09393b193a5a66b003c30161d64d0f29d42a30e6e9f0711ba3d"
+    },
+    "forecast_metrics": {
+      "path": "output/q2_terminal_fix/q2_forecast_metrics.csv",
+      "sha256": "58837f6ea1ad155b43ab6d9dd71f8d93545f7486fc338ed04b78485bbda0af4b"
+    },
+    "scenario_audit": {
+      "path": "output/q2_terminal_fix/q2_scenario_audit.csv",
+      "sha256": "9b1b4d53f2c92488d75d6998936c70edab7269714e747f92705932a4ec4a7cb2"
+    },
+    "executor_comparison": {
+      "path": "output/q2_terminal_fix/q2_executor_comparison.csv",
+      "sha256": "807dc3974299b0943b0ed7c455b2d8e82e9dbfaa4147e2a0bd526da3698e5305"
+    },
+    "interval_details": {
+      "path": "output/q2_terminal_fix/q2_interval_details.csv",
+      "sha256": "0a2dbea48d479aa8ee4002a67fee43660d67310596124981c453e131445fc736"
+    },
+    "backtest_comparison": {
+      "path": "output/q2_terminal_fix/q2_backtest_comparison.csv",
+      "sha256": "11996082834a8e52b568801480d5890f8b6ccb442716525b60076bd36898e015"
+    },
+    "solver_audit": {
+      "path": "output/q2_terminal_fix/q2_solver_audit.csv",
+      "sha256": "c4972b5c175d4ad2235fec63393c966a524abc4cb559de1716e2e7a81e4a4cc0"
+    },
+    "progress_log": {
+      "path": "output/q2_terminal_fix/q2_progress.log",
+      "sha256": "276842b12b1f7284586a2f557b7a9d38cc6db99a7135133292e9033fa86343ec"
+    },
+    "result2": {
+      "path": "output/q2_terminal_fix/result2.xlsx",
+      "sha256": "a09d02fc2c2512577e08729a7ab1c8b3a51d8e627262190980be096044dcf709"
+    }
+  }
+}

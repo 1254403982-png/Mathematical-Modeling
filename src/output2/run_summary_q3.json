@@ -1,0 +1,398 @@
+{
+  "generated_at": "2026-09-12T19:35:46+08:00",
+  "run_type": "full",
+  "formal_days_completed": 334,
+  "problem": "q3_intraday_rolling",
+  "parameters": {
+    "periods_per_day": 144,
+    "delta_t_hours": 0.16666666666666666,
+    "issue_hours": [
+      0,
+      6,
+      12,
+      18
+    ],
+    "kappa_by_hour": {
+      "0": 0,
+      "6": 36,
+      "12": 72,
+      "18": 108
+    },
+    "eta_charge": 0.9,
+    "eta_discharge": 0.9,
+    "soc_min_kwh": 1200.0,
+    "soc_max_kwh": 10800.0,
+    "initial_soc_2025_02_01_kwh": 6000.0,
+    "max_action_kwh_per_period": 833.3333333333334,
+    "max_scenarios": 30,
+    "terminal_price_window": "physical 00:00-05:00",
+    "terminal_price_slot_start": 0,
+    "terminal_price_slot_end_exclusive": 30,
+    "terminal_price_mean_yuan_per_kwh": 0.43339333333333335,
+    "terminal_efficiency_basis": "charge",
+    "terminal_value_coefficient_yuan_per_kwh": 0.48154814814814817,
+    "dp_grid_step_kwh": 10.0,
+    "adjust_up_price_factor": 1.5,
+    "adjust_down_price_factor": 0.5,
+    "effective_plan_composition": "t<=36:g0, 37..72:a6, 73..108:a12, 109..144:a18",
+    "load_forecast": "Q2口径：周五/周六低负荷类（仅1月验证）+最近3同类日+30日偏差；日内更新不修正未来负荷",
+    "boundary_2026_01_01_pv": "附件3无2026数据，光伏仅历史预测",
+    "result3_plan_mapping": "date d: t=2..144 plus date d+1 t=1",
+    "result3_storage_rows": "334 days x 6 blocks, no ellipsis",
+    "result3_emergency_rows": "all 334 days, dynamic intervals per day, no ellipsis"
+  },
+  "bates_granger": {
+    "scope": "2025-01-only",
+    "uses_february_to_december": false,
+    "sample_events": 113,
+    "sample_positions": 16272,
+    "w": 0.1775907856900186,
+    "w_raw": 0.1775907856900186,
+    "denominator": 78349563.77547693,
+    "clipped": false,
+    "formal": {
+      "mae_kwh": 34.357153254056044,
+      "rmse_kwh": 65.91636879478595,
+      "bias_forecast_minus_actual_kwh": 2.157106983366095
+    },
+    "historical": {
+      "mae_kwh": 16.011579481138092,
+      "rmse_kwh": 35.216069442381055,
+      "bias_forecast_minus_actual_kwh": 1.7931960577561494
+    },
+    "combined": {
+      "mae_kwh": 15.803230656782667,
+      "rmse_kwh": 32.98960376471118,
+      "bias_forecast_minus_actual_kwh": 1.857823284956409
+    },
+    "per_issue_hour": {
+      "0": {
+        "events": 29,
+        "formal": {
+          "mae_kwh": 33.358065062260536,
+          "rmse_kwh": 62.22540361175442,
+          "bias_forecast_minus_actual_kwh": 0.02044274026179965
+        },
+        "historical": {
+          "mae_kwh": 16.241741242047596,
+          "rmse_kwh": 35.544337479276074,
+          "bias_forecast_minus_actual_kwh": 1.126224692950116
+        },
+        "combined": {
+          "mae_kwh": 15.82574542954467,
+          "rmse_kwh": 32.885092940780666,
+          "bias_forecast_minus_actual_kwh": 0.9298480071703625
+        }
+      },
+      "6": {
+        "events": 28,
+        "formal": {
+          "mae_kwh": 28.482025223214283,
+          "rmse_kwh": 51.603566313924816,
+          "bias_forecast_minus_actual_kwh": 3.8467658440806725
+        },
+        "historical": {
+          "mae_kwh": 16.45783218472436,
+          "rmse_kwh": 35.926882508306576,
+          "bias_forecast_minus_actual_kwh": 1.2852948296893536
+        },
+        "combined": {
+          "mae_kwh": 15.675978683188571,
+          "rmse_kwh": 32.64278263899229,
+          "bias_forecast_minus_actual_kwh": 1.7401884796573235
+        }
+      },
+      "12": {
+        "events": 28,
+        "formal": {
+          "mae_kwh": 33.91245177331349,
+          "rmse_kwh": 67.08364516184396,
+          "bias_forecast_minus_actual_kwh": 1.4934481109457554
+        },
+        "historical": {
+          "mae_kwh": 15.907092667080297,
+          "rmse_kwh": 35.27240300511576,
+          "bias_forecast_minus_actual_kwh": 2.046375845114907
+        },
+        "combined": {
+          "mae_kwh": 15.922327961400882,
+          "rmse_kwh": 33.483903596717575,
+          "bias_forecast_minus_actual_kwh": 1.9481809743740135
+        }
+      },
+      "18": {
+        "events": 28,
+        "formal": {
+          "mae_kwh": 41.71175267857143,
+          "rmse_kwh": 79.75975183861905,
+          "bias_forecast_minus_actual_kwh": 3.3440806754298764
+        },
+        "historical": {
+          "mae_kwh": 15.431431767810489,
+          "rmse_kwh": 34.08186285292258,
+          "bias_forecast_minus_actual_kwh": 2.738709269156151
+        },
+        "combined": {
+          "mae_kwh": 15.788066453969321,
+          "rmse_kwh": 32.94464006845295,
+          "bias_forecast_minus_actual_kwh": 2.846217652830581
+        }
+      }
+    }
+  },
+  "load_class_validation": {
+    "scope": "2025-01-only",
+    "uses_february_to_december": false,
+    "low_class_weekdays": [
+      "周五",
+      "周六"
+    ],
+    "low_class_sample_days": 9,
+    "regular_class_sample_days": 22,
+    "low_class_mean_daily_load_kwh": 81104.1970925926,
+    "regular_class_mean_daily_load_kwh": 126638.07669166666,
+    "passed": true
+  },
+  "schemes": {
+    "S0": {
+      "days": 334,
+      "plan_cost_yuan": 12718199.25795137,
+      "adj_cost_yuan": 0.0,
+      "emg_cost_yuan": 684023.4161009543,
+      "total_cost_yuan": 13402222.674052324,
+      "adj_up_energy_kwh": 0.0,
+      "adj_down_energy_kwh": 0.0,
+      "emergency_energy_kwh": 127924.1750530234
+    },
+    "S_all": {
+      "days": 334,
+      "plan_cost_yuan": 12724480.264524397,
+      "adj_cost_yuan": 92408.71947123394,
+      "emg_cost_yuan": 325459.27642790554,
+      "total_cost_yuan": 13142348.260423535,
+      "adj_up_energy_kwh": 105939.07535261619,
+      "adj_down_energy_kwh": 122176.1806202097,
+      "emergency_energy_kwh": 69779.91946049976
+    },
+    "S_-6": {
+      "days": 334,
+      "plan_cost_yuan": 12724491.436680855,
+      "adj_cost_yuan": 80766.86013750295,
+      "emg_cost_yuan": 341639.4753606852,
+      "total_cost_yuan": 13146897.772179045,
+      "adj_up_energy_kwh": 91441.32016982538,
+      "adj_down_energy_kwh": 114237.02530337218,
+      "emergency_energy_kwh": 73675.53123020576
+    },
+    "S_-12": {
+      "days": 334,
+      "plan_cost_yuan": 12724544.261452556,
+      "adj_cost_yuan": 116957.8125668322,
+      "emg_cost_yuan": 352008.6890674681,
+      "total_cost_yuan": 13193510.763086855,
+      "adj_up_energy_kwh": 83546.30875418517,
+      "adj_down_energy_kwh": 29770.59515206768,
+      "emergency_energy_kwh": 75206.68815244944
+    },
+    "S_-18": {
+      "days": 334,
+      "plan_cost_yuan": 12721672.381680222,
+      "adj_cost_yuan": 42213.22551910309,
+      "emg_cost_yuan": 475047.42518020346,
+      "total_cost_yuan": 13238933.03237953,
+      "adj_up_energy_kwh": 76727.52248225607,
+      "adj_down_energy_kwh": 111033.2607809101,
+      "emergency_energy_kwh": 92896.9943696365
+    }
+  },
+  "marginal_update_value": {
+    "h6": {
+      "value_yuan": 4549.511755509302,
+      "note": "保留该更新可降低全年费用"
+    },
+    "h12": {
+      "value_yuan": 51162.50266331993,
+      "note": "保留该更新可降低全年费用"
+    },
+    "h18": {
+      "value_yuan": 96584.77195599489,
+      "note": "保留该更新可降低全年费用"
+    }
+  },
+  "boundary": {
+    "target_date": "2026-01-01",
+    "initial_soc_kwh": 9460.349056777959,
+    "t1_plan_kwh": 572.1389046341844,
+    "scenario_count": 30,
+    "status": "Optimal",
+    "max_balance_residual_kwh": 2.2737367544323206e-13,
+    "max_soc_residual_kwh": 1.0231815394945443e-12,
+    "formal_forecast_available": false
+  },
+  "validation": {
+    "tolerance": 1e-06,
+    "max_planning_balance_residual_kwh": 7.029745674458354e-09,
+    "max_planning_soc_residual_kwh": 7.751623343210667e-09,
+    "max_planning_delta_product_kwh2": 0.0,
+    "all_planning_statuses_optimal": true,
+    "max_dp_balance_residual_kwh": 1.0231815394945443e-12,
+    "max_dp_soc_residual_kwh": 1.1368683772161603e-13,
+    "max_dp_value_convexity_violation": 5.821121362714621e-12,
+    "max_analytical_balance_residual_kwh": 1.1368683772161603e-13,
+    "max_analytical_soc_residual_kwh": 9.094947017729282e-13,
+    "billing_dual_formula_max_diff_yuan": 1.4551915228366852e-11,
+    "all_checks_passed": true
+  },
+  "template_validation": {
+    "sheet_names_preserved": true,
+    "plan_rows": 334,
+    "adjusted_rows": 334,
+    "plan_physical_mapping": "date d: t=2..144 plus date d+1 t=1",
+    "storage_rows": 2004,
+    "storage_all_days_filled": true,
+    "emergency_rows_dynamic": true,
+    "emergency_days_with_purchase": 117,
+    "max_roundtrip_value_difference": 5.4569682106375694e-12
+  },
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pulp": "3.3.2",
+    "openpyxl": "3.1.5",
+    "highspy": "1.15.1"
+  },
+  "inputs": {
+    "附件1": {
+      "path": "data/附件/附件1.xlsx",
+      "sha256": "66b87134f5ecccd68184d3539bb1293ef039f9e0fdd955a589b9bfa7f227c377"
+    },
+    "附件2": {
+      "path": "data/附件/附件2.xlsx",
+      "sha256": "2e95fd446bfafa0d8c59577b5c2e2ea8b3f1def20dde54a3062556f4da9b4c72"
+    },
+    "附件3": {
+      "path": "data/附件/附件3.xlsx",
+      "sha256": "8a61b06c52bd0d639a1cc37c61a7d9f5b75edcbca718f64c1bd3498ec9f9d843"
+    },
+    "result3模板": {
+      "path": "data/附件/附件5/result3.xlsx",
+      "sha256": "c59da470cabd0be23f602c95c8aa9d11ec224a0cdac216b3e1f218e65d006bdc"
+    }
+  },
+  "outputs": {
+    "result3.xlsx": {
+      "path": "output/q3_terminal_fix/result3.xlsx",
+      "sha256": "dcdb8c8806e2ebea059d62cb338d6d875b634e124fb2a6d2690d677c481e21cc"
+    },
+    "q3_update_value.csv": {
+      "path": "output/q3_terminal_fix/q3_update_value.csv",
+      "sha256": "fc78524886f486db8f312471d8a88f7233d29ac2e05ffc8618e1175e0aa8fcfa"
+    },
+    "q3_event_index.csv": {
+      "path": "output/q3_terminal_fix/q3_event_index.csv",
+      "sha256": "f86035789230bf3fef36c41b569ffe94daff40f00640315561def14d9c50fdd8"
+    },
+    "q3_scenario_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_scenario_audit.csv",
+      "sha256": "54b898d22ba990ad1832f9d714755726794d56add8025591a99942d41ad201e3"
+    },
+    "q3_forecast_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_forecast_audit.csv",
+      "sha256": "4120bdaaa8110bb97fab291e3a3bcdc22a3a04bc5d0373d7e3cef69d01aaac06"
+    },
+    "q3_bg_calibration.json": {
+      "path": "output/q3_terminal_fix/q3_bg_calibration.json",
+      "sha256": "dfc8d973442f37060cb649db450cd98e01fbb2adc52667623c5dcccc48d52633"
+    },
+    "q3_bg_calibration_samples.csv": {
+      "path": "output/q3_terminal_fix/q3_bg_calibration_samples.csv",
+      "sha256": "670a590b827519efdc11cc07b538d762289bbf6e49c1301f06c49a2450b0de32"
+    },
+    "q3_load_class_validation.csv": {
+      "path": "output/q3_terminal_fix/q3_load_class_validation.csv",
+      "sha256": "dc0af526d771b355818769ee816e4c32a64efda1439aa42d6e00dd8ff273f74d"
+    },
+    "q3_scenarios.npz": {
+      "path": "output/q3_terminal_fix/q3_scenarios.npz",
+      "sha256": "ef3a4a7366b5266d3c4de249f814450624906240096102275d2c8e6fd8e48165"
+    },
+    "q3_boundary.npz": {
+      "path": "output/q3_terminal_fix/q3_boundary.npz",
+      "sha256": "02febc5056bf71f6ad842d3b2120153c4fbc853cd545e6f0929c4856de305c76"
+    },
+    "q3_boundary_meta.json": {
+      "path": "output/q3_terminal_fix/q3_boundary_meta.json",
+      "sha256": "3ad941df18c7d06f7cec763c00cd926814f8e828f0b68632e05c64e9b692cf5c"
+    },
+    "q3_0_daily_metrics.csv": {
+      "path": "output/q3_terminal_fix/q3_0_daily_metrics.csv",
+      "sha256": "ffe04fcc8cdc8e6557f6a68d61bb0c1a1bcd01b34447a9de86f09e68c378a843"
+    },
+    "q3_0_solver_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_0_solver_audit.csv",
+      "sha256": "c8923748f11b2c38c991362209cf04fa7f841983fcd9bf853f32fb7aef596ecf"
+    },
+    "q3_0_executor_comparison.csv": {
+      "path": "output/q3_terminal_fix/q3_0_executor_comparison.csv",
+      "sha256": "0f7b109638bb2370d65057eb1e7b088a27a97f68e1799cc88567c69a1ae39c07"
+    },
+    "q3_all_daily_metrics.csv": {
+      "path": "output/q3_terminal_fix/q3_all_daily_metrics.csv",
+      "sha256": "58ded036904f5b161ef932d6997a66ee0d519042565bfdda0614e1e748e019b2"
+    },
+    "q3_all_solver_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_all_solver_audit.csv",
+      "sha256": "56d89f1a6856b7b7d36bdfa3474e510be825996b54480fb8f7278cfdadc3ac32"
+    },
+    "q3_all_executor_comparison.csv": {
+      "path": "output/q3_terminal_fix/q3_all_executor_comparison.csv",
+      "sha256": "018b5b3f6caf7604cc5d3e86c1061ff1e4d34d4d398f3187407ac8e42116c02c"
+    },
+    "q3_-6_daily_metrics.csv": {
+      "path": "output/q3_terminal_fix/q3_-6_daily_metrics.csv",
+      "sha256": "a0fecf9759fd6b65ba9029be1bb022d1fba4af0ce59bcb48da128d8214ea2572"
+    },
+    "q3_-6_solver_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_-6_solver_audit.csv",
+      "sha256": "7f3ba4b8eedc694c0159e18da8ad627b8d24a7069bdd290b1617d0806d6fac2e"
+    },
+    "q3_-6_executor_comparison.csv": {
+      "path": "output/q3_terminal_fix/q3_-6_executor_comparison.csv",
+      "sha256": "855117288f91e06366c1f6180934ec26d99f847b1b747b7c3d22e056185c3a6a"
+    },
+    "q3_-12_daily_metrics.csv": {
+      "path": "output/q3_terminal_fix/q3_-12_daily_metrics.csv",
+      "sha256": "b65da7e25454cd8df9f396075dc348ee15898a3d10637ac19b784a199185b5b1"
+    },
+    "q3_-12_solver_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_-12_solver_audit.csv",
+      "sha256": "3434ebee090094b4fb0b4040ad71045ce24ed503747d1a8189c8685a2b4dbd5b"
+    },
+    "q3_-12_executor_comparison.csv": {
+      "path": "output/q3_terminal_fix/q3_-12_executor_comparison.csv",
+      "sha256": "a0c6db3dd87e9ffe6610103b426f17a034313b14c32f6d8810d176bd2d7fa198"
+    },
+    "q3_-18_daily_metrics.csv": {
+      "path": "output/q3_terminal_fix/q3_-18_daily_metrics.csv",
+      "sha256": "f798d1a4c80c393f2a46a5ea0d77abb710fc4cae12755f359f964f2d93ea4a35"
+    },
+    "q3_-18_solver_audit.csv": {
+      "path": "output/q3_terminal_fix/q3_-18_solver_audit.csv",
+      "sha256": "5cfb734e55ebd16969b1305d71ead898948e405be7c2f134eb9eefe3406d3969"
+    },
+    "q3_-18_executor_comparison.csv": {
+      "path": "output/q3_terminal_fix/q3_-18_executor_comparison.csv",
+      "sha256": "0e8f48b2d22ff3e86f14cb730999c1fec257d61958b9df088d39c986e991b411"
+    },
+    "q3_all_interval_details.csv": {
+      "path": "output/q3_terminal_fix/q3_all_interval_details.csv",
+      "sha256": "8706788061927f5763f6453b57a1f52f6e5c25e7f9fd36df6e2928686417a36c"
+    },
+    "q3_all_plan_versions.csv": {
+      "path": "output/q3_terminal_fix/q3_all_plan_versions.csv",
+      "sha256": "e64637bd823d9d2af1d857a20f0831dcdf0d190a3c67c75ab719c9bc5a232a54"
+    }
+  },
+  "runtime_seconds": 4.771249500001431,
+  "warnings": []
+}
