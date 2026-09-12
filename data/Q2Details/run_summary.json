@@ -1,0 +1,186 @@
+{
+  "generated_at": "2026-09-12T01:27:40+08:00",
+  "regenerated_by_rebuild_script": true,
+  "reason": "首次完整运行在导出最后一步卡住，未生成run_summary.json；本文件由已落盘CSV与result2重建脚本生成，未重新求解。",
+  "run_type": "full",
+  "formal_days_completed": 334,
+  "parameters": {
+    "periods_per_day": 144,
+    "delta_t_hours": 0.16666666666666666,
+    "eta_charge": 0.9,
+    "eta_discharge": 0.9,
+    "soc_min_kwh": 1200.0,
+    "soc_max_kwh": 10800.0,
+    "initial_soc_2025_02_01_kwh": 6000.0,
+    "max_action_kwh_per_period": 833.3333333333334,
+    "max_scenarios": 30,
+    "terminal_value_coefficient_yuan_per_kwh": 0.33417,
+    "dp_grid_step_kwh": 10.0,
+    "random_seed": 1,
+    "load_class_validation_scope": "2025-01-only",
+    "forecast_bias_window_days": 30,
+    "result2_plan_mapping": "date d: physical t=2..144 plus date d+1 t=1",
+    "result2_storage_rows": "334 days x 6 blocks, no ellipsis",
+    "result2_emergency_rows": "all 334 days, dynamic intervals per day, no ellipsis"
+  },
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pulp": "3.3.2",
+    "openpyxl": "3.1.5",
+    "highspy": "1.15.1"
+  },
+  "inputs": {
+    "price_input": "data/附件/附件1.xlsx",
+    "price_input_sha256": "66b87134f5ecccd68184d3539bb1293ef039f9e0fdd955a589b9bfa7f227c377",
+    "annual_input": "data/附件/附件2.xlsx",
+    "annual_input_sha256": "2e95fd446bfafa0d8c59577b5c2e2ea8b3f1def20dde54a3062556f4da9b4c72",
+    "template": "data/附件/附件5/result2.xlsx",
+    "template_sha256": "1c26494cfc6d754e0bd9bff7e13e1126a73d2d2da6c5336eb251d89b9a1a1a47",
+    "attachment3_read": false
+  },
+  "load_class_validation": {
+    "scope": "2025-01-only",
+    "uses_february_to_december": false,
+    "low_class_weekdays": [
+      "周五",
+      "周六"
+    ],
+    "low_class_sample_days": 9,
+    "regular_class_sample_days": 22,
+    "low_class_mean_daily_load_kwh": 81104.1970925926,
+    "regular_class_mean_daily_load_kwh": 126638.07669166666,
+    "passed": true,
+    "low_to_regular_ratio": 0.640440846950494,
+    "low_class_percent_below_regular": 35.9559153049506
+  },
+  "forecast_backtest": {
+    "aggregate_rows": [
+      {
+        "method": "baseline_recent3_equal_no_bias",
+        "resource": "load",
+        "days": "334",
+        "mean_daily_mae_kwh": "157.51306501152786",
+        "root_mean_daily_mse_kwh": "206.88770410502428",
+        "mean_bias_forecast_minus_actual_kwh": "-0.8637456685009626"
+      },
+      {
+        "method": "baseline_recent3_equal_no_bias",
+        "resource": "pv",
+        "days": "334",
+        "mean_daily_mae_kwh": "25.74308892804668",
+        "root_mean_daily_mse_kwh": "52.24659819417524",
+        "mean_bias_forecast_minus_actual_kwh": "0.25033522873234876"
+      },
+      {
+        "method": "main_weighted_plus_30day_bias",
+        "resource": "load",
+        "days": "334",
+        "mean_daily_mae_kwh": "23.303166512243422",
+        "root_mean_daily_mse_kwh": "31.588947363686714",
+        "mean_bias_forecast_minus_actual_kwh": "-0.05855490185775661"
+      },
+      {
+        "method": "main_weighted_plus_30day_bias",
+        "resource": "pv",
+        "days": "334",
+        "mean_daily_mae_kwh": "26.418015960680012",
+        "root_mean_daily_mse_kwh": "53.925524882712715",
+        "mean_bias_forecast_minus_actual_kwh": "0.17842068144536397"
+      }
+    ],
+    "main_vs_baseline": {
+      "load": {
+        "mae_improved": true,
+        "rmse_improved": true,
+        "main_minus_baseline_mae_kwh": -134.20989849928444,
+        "main_minus_baseline_rmse_kwh": -175.29875674133757
+      },
+      "pv": {
+        "mae_improved": false,
+        "rmse_improved": false,
+        "main_minus_baseline_mae_kwh": 0.674927032633331,
+        "main_minus_baseline_rmse_kwh": 1.678926688537473
+      }
+    },
+    "automatic_fallback_performed": false
+  },
+  "annual_totals": {
+    "days": 334,
+    "plan_energy_kwh": 20605866.194426928,
+    "plan_cost_yuan": 12726442.545124069,
+    "dp_emergency_energy_kwh": 150669.6529849517,
+    "dp_emergency_cost_yuan": 800621.0643657192,
+    "dp_total_cost_yuan": 13527063.609489787,
+    "analytical_emergency_energy_kwh": 146883.187609702,
+    "analytical_emergency_cost_yuan": 886339.7832864629,
+    "analytical_total_cost_yuan": 13612782.328410532,
+    "dp_saving_yuan": 85718.71892074367,
+    "dp_saving_rate_percent": 0.6296928640506105
+  },
+  "validation": {
+    "tolerance": 1e-06,
+    "max_planning_balance_residual_kwh": 1.1553993317647837e-09,
+    "max_planning_soc_residual_kwh": 1.1223164619877934e-09,
+    "max_dp_balance_residual_kwh": 1.0231815394945443e-12,
+    "max_dp_soc_residual_kwh": 1.1368683772161603e-13,
+    "max_analytical_balance_residual_kwh": 1.1368683772161603e-13,
+    "max_analytical_soc_residual_kwh": 9.094947017729282e-13,
+    "max_dp_value_convexity_violation": 4.3653969328261155e-12,
+    "all_planning_statuses_optimal": true,
+    "all_checks_passed": true
+  },
+  "template_validation": {
+    "sheet_names_preserved": true,
+    "plan_rows": 334,
+    "plan_physical_mapping": "date d: t=2..144 plus date d+1 t=1",
+    "storage_rows": 2004,
+    "storage_all_days_filled": true,
+    "emergency_rows_dynamic": true,
+    "emergency_days_with_purchase": 144,
+    "max_roundtrip_value_difference": 3.637978807091713e-12
+  },
+  "boundary_2026_01_01_t1_kwh": 1377.753267865364,
+  "runtime_seconds": null,
+  "warnings": [
+    "主预测对pv未同时改善总体MAE与RMSE；按指令保留主方案，未回退。"
+  ],
+  "outputs": {
+    "result2.xlsx": {
+      "path": "output/q2/result2.xlsx",
+      "sha256": "d2d51256d51a2a556debb6e7e8e16c7df4d1b7d86d6895ef28ccb679128ff5ff"
+    },
+    "q2_daily_metrics.csv": {
+      "path": "output/q2/q2_daily_metrics.csv",
+      "sha256": "b318418f03628e2f98c4690b21715ffc4555748fda418cc01393372bf1d4ea94"
+    },
+    "q2_forecast_metrics.csv": {
+      "path": "output/q2/q2_forecast_metrics.csv",
+      "sha256": "58837f6ea1ad155b43ab6d9dd71f8d93545f7486fc338ed04b78485bbda0af4b"
+    },
+    "q2_scenario_audit.csv": {
+      "path": "output/q2/q2_scenario_audit.csv",
+      "sha256": "9b1b4d53f2c92488d75d6998936c70edab7269714e747f92705932a4ec4a7cb2"
+    },
+    "q2_executor_comparison.csv": {
+      "path": "output/q2/q2_executor_comparison.csv",
+      "sha256": "e06ae5552654ecfd51a0dc608e0151c68efc85bb67c08ddff2eed7b34d5259ae"
+    },
+    "q2_interval_details.csv": {
+      "path": "output/q2/q2_interval_details.csv",
+      "sha256": "332257c71e8818334ca7b06bf9628f52ce9cb695fb4006de4dd2be4b2ca3c315"
+    },
+    "q2_backtest_comparison.csv": {
+      "path": "output/q2/q2_backtest_comparison.csv",
+      "sha256": "11996082834a8e52b568801480d5890f8b6ccb442716525b60076bd36898e015"
+    },
+    "q2_solver_audit.csv": {
+      "path": "output/q2/q2_solver_audit.csv",
+      "sha256": "c248979d57deb14309a8b983af6912406771d25f4041451b8ff7fd755a1ecae8"
+    },
+    "q2_load_class_validation.csv": {
+      "path": "output/q2/q2_load_class_validation.csv",
+      "sha256": "dc0af526d771b355818769ee816e4c32a64efda1439aa42d6e00dd8ff273f74d"
+    }
+  }
+}
