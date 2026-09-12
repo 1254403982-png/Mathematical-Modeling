@@ -1,0 +1,3 @@
+﻿baseline,branch_contract,status,source_path,repriced_total_cost_yuan,note
+Q2_existing_actions_terminal_fix,4-2,repriced,output/q2_terminal_fix/q2_interval_details.csv,14278632.399028353,baseline only; not a bound
+Q3_existing_actions_terminal_fix,4-3,repriced,output/q3_terminal_fix/q3_all_interval_details.csv,13873733.943549393,baseline only; not a bound
