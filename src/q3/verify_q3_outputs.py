@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from collections import defaultdict
@@ -300,6 +301,7 @@ def verify_result3(summary: dict, prices: np.ndarray) -> None:
     boundary_res = q3.solve_window_lp(
         q3.BOUNDARY_PLAN_DATE, 0, "original", prices, boundary_net,
         dec31_terminal, None, T,
+        terminal_value_coefficient=q2.terminal_value_coefficient(prices),
     )
     boundary_t1 = float(boundary_res.z[0])
     check("边界日LP复算Optimal", boundary_res.status == "Optimal",
@@ -353,6 +355,45 @@ def verify_result3(summary: dict, prices: np.ndarray) -> None:
 # --------------------------------------------------------------------- #
 # 5. update_value
 # --------------------------------------------------------------------- #
+# --------------------------------------------------------------------- #
+# 6. 终值系数
+# --------------------------------------------------------------------- #
+def verify_terminal(summary: dict, prices: np.ndarray) -> None:
+    params = summary.get("parameters", {})
+    mean = float(np.mean(prices[:30]))
+    coefficient = mean / q2.ETA_CHARGE
+    check("凌晨00:00-05:00均价=0.433393333333",
+          np.isclose(mean, 0.43339333333333335, atol=1e-12))
+    recorded = params.get("terminal_value_coefficient_yuan_per_kwh")
+    if recorded is None:
+        check("终值系数符合定案", False, "run_summary缺少该字段")
+        check("run_summary终值窗口与效率口径", False, "run_summary缺少该字段")
+    else:
+        recorded = float(recorded)
+        check("终值系数符合定案",
+              abs(recorded - 0.4815481481481482) < 1e-9
+              and not np.isclose(recorded, 0.33417, atol=1e-8),
+              f"记录={recorded:.12f}")
+        check("run_summary终值窗口与效率口径",
+              params.get("terminal_price_window") == "physical 00:00-05:00"
+              and params.get("terminal_price_slot_start") == 0
+              and params.get("terminal_price_slot_end_exclusive") == 30
+              and params.get("terminal_efficiency_basis") == "charge"
+              and np.isclose(
+                  float(params.get("terminal_price_mean_yuan_per_kwh", float("nan"))),
+                  mean,
+                  atol=1e-12,
+              ))
+    check("run_summary all_checks_passed=true",
+          summary.get("validation", {}).get("all_checks_passed") is True)
+    annual = sum(
+        float(row["dp_total_cost_yuan"])
+        for row in q3.read_csv_rows(OUT / "q3_all_daily_metrics.csv")
+    )
+    check("Q3 全年费用量级对照完整稿(-5%内)",
+          abs(annual / 13024699.25 - 1) < 0.05, f"复算={annual:,.2f}")
+
+
 def verify_update_value() -> None:
     path = OUT / "q3_update_value.csv"
     if not path.is_file():
@@ -387,8 +428,17 @@ def verify_update_value() -> None:
 
 
 def main() -> None:
+    global OUT, RESULT3
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, default=None,
+                        help="输出目录，默认output/q3")
+    args = parser.parse_args()
+    if args.out is not None:
+        OUT = args.out.resolve()
+        RESULT3 = OUT / "result3.xlsx"
     print("=" * 70)
     print("Q3 产物独立复核")
+    print(f"输出目录：{OUT}")
     print("=" * 70)
     summary_path = OUT / "run_summary.json"
     if not summary_path.is_file():
@@ -401,6 +451,7 @@ def main() -> None:
 
     verify_hashes(summary)
     verify_prep(summary)
+    verify_terminal(summary, prices)
     for scheme in SCHEMES:
         verify_scheme(scheme)
     verify_freeze_and_composition()

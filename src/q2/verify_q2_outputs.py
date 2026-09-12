@@ -7,6 +7,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import json
 from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
@@ -64,9 +65,69 @@ def main() -> None:
     wb = load_workbook(root / "data/附件/附件1.xlsx", data_only=True, read_only=True)
     ws = wb.active
     prices = [float(ws.cell(row, 2).value) for row in range(2, 146)]
+    price_labels = [
+        ws.cell(row, 1).value.strftime("%H:%M")
+        if hasattr(ws.cell(row, 1).value, "strftime")
+        else str(ws.cell(row, 1).value)
+        for row in range(2, 146)
+    ]
     wb.close()
     shifted_prices = np.concatenate((prices[1:], prices[:1]))
     check("附件1电价144个", len(prices) == 144)
+    check(
+        "凌晨窗口严格止于05:00且不含05:10",
+        price_labels[29] == "05:00" and price_labels[30] == "05:10",
+    )
+    terminal_price_mean = float(np.mean(prices[:30]))
+    terminal_value_coefficient = terminal_price_mean / 0.9
+    check(
+        f"凌晨00:00-05:00均价={terminal_price_mean:.12f}",
+        np.isclose(
+            terminal_price_mean,
+            0.43339333333333335,
+            atol=1.0e-12,
+        ),
+    )
+    check(
+        f"充电边际终值系数={terminal_value_coefficient:.12f}",
+        np.isclose(
+            terminal_value_coefficient,
+            0.4815481481481482,
+            atol=1.0e-12,
+        )
+        and not np.isclose(terminal_value_coefficient, 0.33417, atol=1.0e-8),
+    )
+
+    summary = json.loads((out / "run_summary.json").read_text(encoding="utf-8"))
+    parameters = summary.get("parameters", {})
+    check(
+        "run_summary终值窗口与效率口径",
+        parameters.get("terminal_price_window") == "physical 00:00-05:00"
+        and parameters.get("terminal_price_slot_start") == 0
+        and parameters.get("terminal_price_slot_end_exclusive") == 30
+        and parameters.get("terminal_efficiency_basis") == "charge",
+    )
+    check(
+        "run_summary凌晨均价与终值系数",
+        np.isclose(
+            f(parameters.get("terminal_price_mean_yuan_per_kwh", float("nan"))),
+            terminal_price_mean,
+            atol=1.0e-12,
+        )
+        and np.isclose(
+            f(
+                parameters.get(
+                    "terminal_value_coefficient_yuan_per_kwh", float("nan")
+                )
+            ),
+            terminal_value_coefficient,
+            atol=1.0e-12,
+        ),
+    )
+    check(
+        "run_summary all_checks_passed=true",
+        summary.get("validation", {}).get("all_checks_passed") is True,
+    )
 
     interval_rows = read_csv(out / "q2_interval_details.csv")
     detail: dict[tuple[str, int], dict[str, str]] = {
@@ -88,6 +149,9 @@ def main() -> None:
     # ---------- 3 逐时段残差、SOC、互斥 ----------
     max_dp_bal = max_ana_bal = max_dp_soc = max_ana_soc = 0.0
     max_charge = max_discharge = max_product = 0.0
+    min_nonnegative_flow = float("inf")
+    min_soc = float("inf")
+    max_soc = float("-inf")
     for day in dates:
         rows = day_rows[day]
         for t in range(1, 145):
@@ -98,7 +162,8 @@ def main() -> None:
                 ("ana", "analytical_charge_kwh", "analytical_discharge_kwh", "analytical_emergency_kwh", "analytical_unused_kwh", "analytical_end_soc_kwh"),
             ):
                 c = f(row[ck]); d = f(row[dk]); b = f(row[bk]); u = f(row[uk]); e = f(row[sk])
-                balance = f(row["plan_grid_kwh"]) + b + d - net - c - u
+                plan = f(row["plan_grid_kwh"])
+                balance = plan + b + d - net - c - u
                 if t == 1:
                     initial_key = (
                         "dp_initial_soc_kwh" if prefix == "dp" else "analytical_initial_soc_kwh"
@@ -116,6 +181,11 @@ def main() -> None:
                 max_charge = max(max_charge, c, d)
                 max_discharge = max(max_discharge, d)
                 max_product = max(max_product, c * d)
+                min_nonnegative_flow = min(
+                    min_nonnegative_flow, plan, c, d, b, u
+                )
+                min_soc = min(min_soc, e)
+                max_soc = max(max_soc, e)
     check(f"DP平衡残差<=1e-6 (max={max_dp_bal:.3g})", max_dp_bal <= TOL)
     check(f"解析平衡残差<=1e-6 (max={max_ana_bal:.3g})", max_ana_bal <= TOL)
     check(f"DP SOC残差<=1e-6 (max={max_dp_soc:.3g})", max_dp_soc <= TOL)
@@ -124,6 +194,8 @@ def main() -> None:
         f"C/D<=833.3333且互斥 (max={max_charge:.6f}, prod={max_product:.3g})",
         max_charge <= 5000.0 / 6.0 + TOL and max_product <= 1.0e-8,
     )
+    check(f"购电/充/放/紧急/弃用非负 (min={min_nonnegative_flow:.3g})", min_nonnegative_flow >= -TOL)
+    check(f"SOC位于[1200,10800] (min={min_soc:.6f}, max={max_soc:.6f})", min_soc >= 1200.0 - TOL and max_soc <= 10800.0 + TOL)
 
     # ---------- 4 daily_metrics ----------
     check("daily_metrics 334行", len(daily) == 334 and sorted(dm) == expected_dates)
@@ -390,6 +462,7 @@ def main() -> None:
     print(f"  DP紧急费 = {dp_emg:.2f} 元, DP总 = {dp_total:.2f} 元")
     print(f"  解析紧急费 = {ana_emg:.2f} 元, 解析总 = {ana_total:.2f} 元")
     print(f"  DP节省 = {ana_emg - dp_emg:.2f} 元 ({(ana_emg - dp_emg) / ana_total * 100:.4f}%)")
+    print(f"  实际费用未含终值抵扣：计划+紧急=总成立（费用恒等式检查项）")
 
     fails = [item for item in results if not item[1]]
     print(f"\n总结：{len(results) - len(fails)}/{len(results)} 项通过")

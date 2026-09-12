@@ -40,6 +40,10 @@ MAX_SCENARIOS = 30
 PRIMARY_HISTORY_DAYS = 3
 BIAS_WINDOW_DAYS = 30
 DEFAULT_DP_GRID_STEP_KWH = 10.0
+TERMINAL_PRICE_WINDOW = "physical 00:00-05:00"
+TERMINAL_PRICE_SLOT_START = 0
+TERMINAL_PRICE_SLOT_END_EXCLUSIVE = 30
+TERMINAL_EFFICIENCY_BASIS = "charge"
 RANDOM_SEED = 1
 CHECK_TOLERANCE = 1.0e-6
 SIMULTANEOUS_PRODUCT_TOLERANCE = 1.0e-8
@@ -341,6 +345,31 @@ def read_prices(path: Path) -> tuple[np.ndarray, tuple[str, ...]]:
     finally:
         workbook.close()
     return np.asarray(prices, dtype=np.float64), tuple(labels)
+
+
+def calculate_terminal_value_parameters(
+    prices: np.ndarray,
+) -> tuple[float, float]:
+    if prices.shape != (T,):
+        raise ValueError(f"终值系数要求{T}个时段电价，实际维度为{prices.shape}")
+    if not np.all(np.isfinite(prices)):
+        raise ValueError("终值系数电价包含非有限值")
+    if ETA_CHARGE <= 0.0:
+        raise ValueError("充电效率必须为正")
+    overnight_price_mean = float(
+        np.mean(
+            prices[
+                TERMINAL_PRICE_SLOT_START:TERMINAL_PRICE_SLOT_END_EXCLUSIVE
+            ]
+        )
+    )
+    terminal_value_coefficient = overnight_price_mean / ETA_CHARGE
+    return overnight_price_mean, terminal_value_coefficient
+
+
+def terminal_value_coefficient(prices: np.ndarray) -> float:
+    """Q2/Q3共用入口：附件1凌晨00:00-05:00均价除以充电效率。"""
+    return calculate_terminal_value_parameters(prices)[1]
 
 
 def read_annual_data(path: Path) -> AnnualData:
@@ -1851,6 +1880,9 @@ def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
     prices, price_labels = read_prices(price_path)
     annual = read_annual_data(annual_path)
     validate_time_inputs(price_labels, annual)
+    overnight_price_mean, terminal_value_coefficient = (
+        calculate_terminal_value_parameters(prices)
+    )
     january_indices = [i for i, day in enumerate(annual.dates) if day.month == 1]
     january_dates = tuple(annual.dates[i] for i in january_indices)
     january_load = annual.load_kwh[january_indices].copy()
@@ -1878,7 +1910,6 @@ def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
         encoding="utf-8",
     )
     date_to_index = {day: i for i, day in enumerate(annual.dates)}
-    terminal_value_coefficient = ETA_DISCHARGE * float(np.min(prices))
     dp_initial_soc = INITIAL_SOC_KWH
     analytical_initial_soc = INITIAL_SOC_KWH
     runs: dict[date, DailyRun] = {}
@@ -2053,6 +2084,11 @@ def run_pipeline(args: argparse.Namespace) -> dict[str, Any]:
             "initial_soc_2025_02_01_kwh": INITIAL_SOC_KWH,
             "max_action_kwh_per_period": MAX_ACTION_KWH,
             "max_scenarios": MAX_SCENARIOS,
+            "terminal_price_window": TERMINAL_PRICE_WINDOW,
+            "terminal_price_slot_start": TERMINAL_PRICE_SLOT_START,
+            "terminal_price_slot_end_exclusive": TERMINAL_PRICE_SLOT_END_EXCLUSIVE,
+            "terminal_price_mean_yuan_per_kwh": overnight_price_mean,
+            "terminal_efficiency_basis": TERMINAL_EFFICIENCY_BASIS,
             "terminal_value_coefficient_yuan_per_kwh": terminal_value_coefficient,
             "dp_grid_step_kwh": args.dp_grid_step,
             "random_seed": RANDOM_SEED,

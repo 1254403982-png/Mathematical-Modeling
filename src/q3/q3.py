@@ -57,7 +57,6 @@ FOUR_HOUR_LABELS = q2.FOUR_HOUR_LABELS
 ISSUE_HOURS = (0, 6, 12, 18)
 HOUR_INDEX = {0: 0, 6: 1, 12: 2, 18: 3}
 KAPPA = {0: 0, 6: 36, 12: 72, 18: 108}
-TERMINAL_VALUE_COEFFICIENT = 0.33417  # v = eta_d * min(price) = 0.9 * 0.3713
 DP_GRID_STEP_KWH = 10.0
 ADJUST_UP_PRICE_FACTOR = 1.5
 ADJUST_DOWN_PRICE_FACTOR = 0.5
@@ -884,6 +883,8 @@ def solve_window_lp(
     initial_soc: float,
     g0: np.ndarray | None,
     ncur: int,
+    *,
+    terminal_value_coefficient: float,
 ) -> UpdateResult:
     if scenario_net.ndim != 2 or scenario_net.shape[1] != T or scenario_net.shape[0] < 1:
         raise ValueError(f"窗口场景净负荷维度异常：{scenario_net.shape}")
@@ -900,7 +901,7 @@ def solve_window_lp(
         prices_window,
         scenario_net,
         initial_soc,
-        TERMINAL_VALUE_COEFFICIENT,
+        terminal_value_coefficient,
         ncur,
         g0,
         binary_mutex=False,
@@ -940,7 +941,7 @@ def solve_window_lp(
             prices_window,
             scenario_net,
             initial_soc,
-            TERMINAL_VALUE_COEFFICIENT,
+            terminal_value_coefficient,
             ncur,
             g0,
             binary_mutex=True,
@@ -1118,6 +1119,7 @@ def run_scheme(args: argparse.Namespace) -> None:
     if scheme is None:
         raise ValueError("--scheme 必须给出")
     prices, _ = q2.read_prices(input_path(args.root, "附件1"))
+    terminal_value_coefficient = q2.terminal_value_coefficient(prices)
     annual = q2.read_annual_data(input_path(args.root, "附件2"))
     index = read_csv_rows(out / "q3_event_index.csv")
     if len(index) % 4 != 0 or len(index) < 4:
@@ -1214,20 +1216,22 @@ def run_scheme(args: argparse.Namespace) -> None:
                     pw = window_prices(t_abs, prices)
                     if h == 0:
                         result = solve_window_lp(
-                            d, 0, "original", pw, scenario_net, current_soc, None, T
+                            d, 0, "original", pw, scenario_net, current_soc, None, T,
+                            terminal_value_coefficient=terminal_value_coefficient,
                         )
                         g0 = result.z
                         geff = g0.copy()
                     else:
                         result = solve_window_lp(
-                            d, h, "rolling", pw, scenario_net, current_soc, g0, T - k
+                            d, h, "rolling", pw, scenario_net, current_soc, g0, T - k,
+                            terminal_value_coefficient=terminal_value_coefficient,
                         )
                         geff[k:k_next] = result.z[: k_next - k]
                     future_values, conv = q2.average_scenario_value_functions(
                         scenario_net,
                         result.z,
                         pw,
-                        TERMINAL_VALUE_COEFFICIENT,
+                        terminal_value_coefficient,
                         grid,
                     )
                     day_conv = max(day_conv, conv)
@@ -1838,6 +1842,9 @@ def assemble(args: argparse.Namespace) -> None:
     root = args.root
     out = output_dir(args)
     prices, _ = q2.read_prices(input_path(root, "附件1"))
+    terminal_price_mean, terminal_value_coefficient = (
+        q2.calculate_terminal_value_parameters(prices)
+    )
     annual = q2.read_annual_data(input_path(root, "附件2"))
     started = time.perf_counter()
 
@@ -1885,7 +1892,8 @@ def assemble(args: argparse.Namespace) -> None:
     boundary_net = boundary_load[:boundary_m] - boundary_pv[:boundary_m]
     dec31_terminal = float(daily[-1]["dp_terminal_soc_kwh"])
     boundary_result = solve_window_lp(
-        BOUNDARY_PLAN_DATE, 0, "original", prices, boundary_net, dec31_terminal, None, T
+        BOUNDARY_PLAN_DATE, 0, "original", prices, boundary_net, dec31_terminal, None, T,
+        terminal_value_coefficient=terminal_value_coefficient,
     )
     boundary_t1 = float(boundary_result.z[0])
 
@@ -2021,7 +2029,12 @@ def assemble(args: argparse.Namespace) -> None:
             "initial_soc_2025_02_01_kwh": INITIAL_SOC_KWH,
             "max_action_kwh_per_period": MAX_ACTION_KWH,
             "max_scenarios": MAX_SCENARIOS,
-            "terminal_value_coefficient_yuan_per_kwh": TERMINAL_VALUE_COEFFICIENT,
+            "terminal_price_window": q2.TERMINAL_PRICE_WINDOW,
+            "terminal_price_slot_start": q2.TERMINAL_PRICE_SLOT_START,
+            "terminal_price_slot_end_exclusive": q2.TERMINAL_PRICE_SLOT_END_EXCLUSIVE,
+            "terminal_price_mean_yuan_per_kwh": terminal_price_mean,
+            "terminal_efficiency_basis": q2.TERMINAL_EFFICIENCY_BASIS,
+            "terminal_value_coefficient_yuan_per_kwh": terminal_value_coefficient,
             "dp_grid_step_kwh": DP_GRID_STEP_KWH,
             "adjust_up_price_factor": ADJUST_UP_PRICE_FACTOR,
             "adjust_down_price_factor": ADJUST_DOWN_PRICE_FACTOR,

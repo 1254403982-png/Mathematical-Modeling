@@ -1,10 +1,11 @@
 """并行启动五个Q3方案进程（先检查prep产物），全部完成后自动执行assemble。
 
-用法：python scr/q3_run_schemes.py
+用法：python scr/q3_run_schemes.py [--out output/q3]
 也可以手动开终端分别运行：python scr/q3.py --scheme all|-6|-12|-18|0
 """
 from __future__ import annotations
 
+import argparse
 import subprocess
 import sys
 import time
@@ -14,9 +15,13 @@ SCHEMES = ("0", "all", "-6", "-12", "-18")
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=Path, default=None,
+                        help="输出目录，默认output/q3")
+    args = parser.parse_args()
     root = Path(__file__).resolve().parent.parent
     q3_script = Path(__file__).resolve().parent / "q3.py"
-    out = root / "output" / "q3"
+    out = (args.out or root / "output" / "q3").resolve()
     out.mkdir(parents=True, exist_ok=True)
     required = (out / "q3_scenarios.npz", out / "q3_event_index.csv")
     missing = [path.name for path in required if not path.is_file()]
@@ -29,7 +34,7 @@ def main() -> None:
     for scheme in SCHEMES:
         log = (out / f"q3_{scheme}_console.log").open("w", encoding="utf-8")
         process = subprocess.Popen(
-            [sys.executable, str(q3_script), "--scheme", scheme],
+            [sys.executable, str(q3_script), "--scheme", scheme, "--out", str(out)],
             cwd=str(root),
             stdout=log,
             stderr=subprocess.STDOUT,
@@ -62,7 +67,8 @@ def main() -> None:
         raise SystemExit(f"方案失败：{failed}，不执行assemble")
     print("[runner] 全部方案完成，开始assemble", flush=True)
     result = subprocess.run(
-        [sys.executable, str(q3_script), "--assemble"], cwd=str(root)
+        [sys.executable, str(q3_script), "--assemble", "--out", str(out)],
+        cwd=str(root),
     )
     raise SystemExit(result.returncode)
 
