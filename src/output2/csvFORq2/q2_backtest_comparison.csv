@@ -1,0 +1,5 @@
+﻿method,resource,days,mean_daily_mae_kwh,root_mean_daily_mse_kwh,mean_bias_forecast_minus_actual_kwh
+baseline_recent3_equal_no_bias,load,334,157.51306501152786,206.88770410502428,-0.8637456685009626
+baseline_recent3_equal_no_bias,pv,334,25.74308892804668,52.24659819417524,0.25033522873234876
+main_weighted_plus_30day_bias,load,334,23.303166512243422,31.588947363686714,-0.05855490185775661
+main_weighted_plus_30day_bias,pv,334,26.418015960680012,53.925524882712715,0.17842068144536397
